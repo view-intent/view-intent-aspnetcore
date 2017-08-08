@@ -38,9 +38,6 @@ namespace ViewIntent.Mvc {
 				return (Request.Query["vi"].Count > 0 ? Request.Query["vi"][0].ToString().ToLowerInvariant() : null);
 			}
 		}
-
-
-
 		public new async Task<object> View(ViewOptions options = null) {
 			return await this.View(GetViewName(), options);
 		}
@@ -58,47 +55,47 @@ namespace ViewIntent.Mvc {
 			string dynamicRequestQuery = (Request.Query["vi"].Count > 0 ? Request.Query["vi"][0].ToString().ToLowerInvariant() : null);
 			string typeValue = options.Type.ToString().ToLowerInvariant();
 			// properties ------------------------------------
-			var area = RouteData.Values["Area"];
-			var controller = RouteData.Values["Controller"];
-			var action = RouteData.Values["Action"];
-			var path = HttpContext.Request.Path.Value;
-			// --------------------------------------------------
+			//var area = RouteData.Values["Area"];
+			//var controller = RouteData.Values["Controller"];
+			//var action = RouteData.Values["Action"];
+			//var path = HttpContext.Request.Path.Value;
+			//// --------------------------------------------------
 
 
-			// --------------------------------------------------
-			options.ViewId = GetViewId(options.ViewId);
-			options.HolderId = GetHolderId(options.HolderId);
-			ViewData["viewOptions"] = options;
-			// output ----------------------------------------
-			if (dynamicRequestQuery != null) {
-				var outputModel = new OutputModel() {
-					Title = options.Title,
-					Path = path,
-					Type = options.Type,
-					Model = model,
-					ViewId = options.ViewId,
-					HolderId = options.HolderId,
-					Cache = options.Cache,
-					//AllowMultiple = options.AllowMultiple,
-					PreRequire = options.PreRequire,
-					PosRequire = options.PosRequire,
-					PushState = options.PushState,
-					ActiveViews = options.ActiveViews,
-					ViewTypes = options.ViewTypes
-				};
+			//// --------------------------------------------------
+			//options.ViewId = GetViewId(options.ViewId);
+			//options.HolderId = GetHolderId(options.HolderId);
+			//ViewData["viewOptions"] = options;
+			//// output ----------------------------------------
+			//if (dynamicRequestQuery != null) {
+			//	var outputModel = new OutputModel() {
+			//		Title = options.Title,
+			//		Path = path,
+			//		Type = options.Type,
+			//		Model = model,
+			//		ViewId = options.ViewId,
+			//		HolderId = options.HolderId,
+			//		Cache = options.Cache,
+			//		//AllowMultiple = options.AllowMultiple,
+			//		PreRequire = options.PreRequire,
+			//		PosRequire = options.PosRequire,
+			//		PushState = options.PushState,
+			//		ActiveViews = options.ActiveViews,
+			//		ViewTypes = options.ViewTypes
+			//	};
 
-				// Headers ------------------------------
-				Response.Headers.Add("Dynamic", outputModel.GetDynamicHead());
-				// template and model
-				if (dynamicRequestQuery == "template" || dynamicRequestQuery == "partial" || (dynamicRequestQuery == "model" && options.Type == DynamicType.Razor)) {
-					return base.PartialView(viewName, model);
-				} else if (dynamicRequestQuery == "model") {
-					outputModel.Model = model;
-					return Task.FromResult<object>(outputModel).Result;
-				}
-			}
+			//	// Headers ------------------------------
+			//	Response.Headers.Add("Dynamic", outputModel.GetDynamicHead());
+			//	// template and model
+			//	if (dynamicRequestQuery == "template" || dynamicRequestQuery == "partial" || (dynamicRequestQuery == "model" && options.Type == DynamicType.Razor)) {
+			//		return base.PartialView(viewName, model);
+			//	} else if (dynamicRequestQuery == "model") {
+			//		outputModel.Model = model;
+			//		return Task.FromResult<object>(outputModel).Result;
+			//	}
+			//}
 			// ------------------
-			ViewData["viewOptions"] = options;
+			//ViewData["viewOptions"] = options;
 
 
 			return base.View(viewName, model);
