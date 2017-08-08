@@ -21,6 +21,9 @@ namespace ViewIntent.Mvc {
 		public string Action {
 			get { return RouteData.Values["Action"]?.ToString(); }
 		}
+		public string Path {
+			get { return HttpContext.Request.Path.Value; }
+		}
 		public string GetViewName() {
 			if (Area.ToString() != "Default") {
 				return $"../Areas/{Area}/{Controller}/{Action}";
@@ -28,27 +31,31 @@ namespace ViewIntent.Mvc {
 				return $"../{Controller}/{Action}";
 			}
 		}
+		public string RequestHeadInfo() {
+			if(Request.Headers["vi"].Count > 0) {
+				return (Request.Headers["vi"].Count > 0 ? Request.Headers["vi"][0].ToString().ToLowerInvariant() : null);
+			} else {
+				return (Request.Query["vi"].Count > 0 ? Request.Query["vi"][0].ToString().ToLowerInvariant() : null);
+			}
+		}
 
-		public new async Task<object> View(ViewOptions options = null)
-		{
+
+
+		public new async Task<object> View(ViewOptions options = null) {
 			return await this.View(GetViewName(), options);
 		}
-		public new async Task<object> View(string viewName, ViewOptions options = null)
-		{
+		public new async Task<object> View(string viewName, ViewOptions options = null) {
 			return await this.View(viewName, null, options);
 		}
-		public new async Task<object> View(object model, ViewOptions options = null)
-		{
+		public new async Task<object> View(object model, ViewOptions options = null) {
 			return await this.View(GetViewName(), model, options);
 		}
-		public new async Task<object> View(string viewName, object model, ViewOptions options = null)
-		{
-			if (options == null)
-			{
+		public new async Task<object> View(string viewName, object model, ViewOptions options = null) {
+			if (options == null) {
 				options = new ViewOptions();
 			}
-			string dynamicRequestHeader = (Request.Headers["Dynamic"].Count > 0 ? Request.Headers["dynamic"][0].ToString().ToLowerInvariant() : null);
-			string dynamicRequestQuery = (Request.Query["dynamic"].Count > 0 ? Request.Query["dynamic"][0].ToString().ToLowerInvariant() : null);
+			string dynamicRequestHeader = (Request.Headers["vi"].Count > 0 ? Request.Headers["vi"][0].ToString().ToLowerInvariant() : null);
+			string dynamicRequestQuery = (Request.Query["vi"].Count > 0 ? Request.Query["vi"][0].ToString().ToLowerInvariant() : null);
 			string typeValue = options.Type.ToString().ToLowerInvariant();
 			// properties ------------------------------------
 			var area = RouteData.Values["Area"];
@@ -63,10 +70,8 @@ namespace ViewIntent.Mvc {
 			options.HolderId = GetHolderId(options.HolderId);
 			ViewData["viewOptions"] = options;
 			// output ----------------------------------------
-			if (dynamicRequestQuery != null)
-			{
-				var outputModel = new OutputModel()
-				{
+			if (dynamicRequestQuery != null) {
+				var outputModel = new OutputModel() {
 					Title = options.Title,
 					Path = path,
 					Type = options.Type,
@@ -85,12 +90,9 @@ namespace ViewIntent.Mvc {
 				// Headers ------------------------------
 				Response.Headers.Add("Dynamic", outputModel.GetDynamicHead());
 				// template and model
-				if (dynamicRequestQuery == "template" || dynamicRequestQuery == "partial" || (dynamicRequestQuery == "model" && options.Type == DynamicType.Razor))
-				{
+				if (dynamicRequestQuery == "template" || dynamicRequestQuery == "partial" || (dynamicRequestQuery == "model" && options.Type == DynamicType.Razor)) {
 					return base.PartialView(viewName, model);
-				}
-				else if (dynamicRequestQuery == "model")
-				{
+				} else if (dynamicRequestQuery == "model") {
 					outputModel.Model = model;
 					return Task.FromResult<object>(outputModel).Result;
 				}
@@ -108,7 +110,7 @@ namespace ViewIntent.Mvc {
 
 		public ViewIntentResult ViewIntent(string viewId) {
 
-			
+
 
 			return new ViewIntentResult() {
 				ViewId = viewId
