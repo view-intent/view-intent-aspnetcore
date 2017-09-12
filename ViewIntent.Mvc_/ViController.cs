@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 
 namespace ViewIntent.Mvc {
-	public class ViewIntentController : Controller {
+	public class ViController : Controller {
 		public string Area {
 			get { return RouteData.Values["Area"]?.ToString() ?? "Default"; }
 		}
@@ -38,28 +38,79 @@ namespace ViewIntent.Mvc {
 				return (Request.Query["vi"].Count > 0 ? Request.Query["vi"][0].ToString().ToLowerInvariant() : null);
 			}
 		}
-		public new async Task<object> View(ViewOptions options = null) {
+		public async Task<object> View(ViewOptions options = null) {
 			return await this.View(GetViewName(), options);
 		}
-		public new async Task<object> View(string viewName, ViewOptions options = null) {
-			return await this.View(viewName, null, options);
+		public new async Task<object> View(string viewName) {
+			return await this.View(viewName, null);
 		}
-		public new async Task<object> View(object model, ViewOptions options = null) {
-			return await this.View(GetViewName(), model, options);
+		public new async Task<object> View(object model) {
+			return await this.View(GetViewName(), model);
 		}
-		public new async Task<object> View(string viewName, object model, ViewOptions options = null) {
-			if (options == null) {
-				options = new ViewOptions();
+		public new async Task<object> View(string viewName, object model) {
+			if(model == null) {
+				model = new ViModel();
 			}
-			string dynamicRequestHeader = (Request.Headers["vi"].Count > 0 ? Request.Headers["vi"][0].ToString().ToLowerInvariant() : null);
-			string dynamicRequestQuery = (Request.Query["vi"].Count > 0 ? Request.Query["vi"][0].ToString().ToLowerInvariant() : null);
-			string typeValue = options.Type.ToString().ToLowerInvariant();
-			// properties ------------------------------------
+			if(model is IViModel) {
+				IViModel viModel = model as IViModel;
+				return View(viewName, model);
+			} else {
+				
+				if(model is ViewOptions) {
+					ViewOptions viewOptions = model as ViewOptions;
+					return View(viewName, model);
+				} else {
+					return View(viewName, model);
+				}
+			}
+
+
+
+			//var s = await View(viewName, model);
+			//return s;
+
+
+			
+
+
+
+
+
+
+
+
+			//string tplUrl = ("http://localhost:50042/login/home/str1/");
+			//var c = new System.Net.Http.HttpClient();
+
+			
+
+
+			//ActionContext ctx = ActionContext();
+
+			//var pv = base.PartialView();
+			//pv.ExecuteResult();
+
+
+			//return Request.Path.Value;
+			//var string1 = await c.GetAsync("http://localhost:50042/login/home/str1/");
+			//return string1;
+
+			//return PartialViewResult()
+			//var b = Response.Body;
+			//Response.Body.Flush();
+
+
+			//string dynamicRequestHeader = (Request.Headers["vi"].Count > 0 ? Request.Headers["vi"][0].ToString().ToLowerInvariant() : null);
+			//string dynamicRequestQuery = (Request.Query["vi"].Count > 0 ? Request.Query["vi"][0].ToString().ToLowerInvariant() : null);
+			//string typeValue = options.Type.ToString().ToLowerInvariant();
+			// properties ---------------------------------------
 			//var area = RouteData.Values["Area"];
 			//var controller = RouteData.Values["Controller"];
 			//var action = RouteData.Values["Action"];
 			//var path = HttpContext.Request.Path.Value;
 			//// --------------------------------------------------
+			//options.ViewId = 
+
 
 
 			//// --------------------------------------------------
@@ -106,8 +157,6 @@ namespace ViewIntent.Mvc {
 
 
 		public ViewIntentResult ViewIntent(string viewId) {
-
-
 
 			return new ViewIntentResult() {
 				ViewId = viewId
